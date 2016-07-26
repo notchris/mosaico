@@ -19,7 +19,7 @@ Additional Files: list.php, save.php, update.php, data.php
 
 Edited Files: index.html, editor.html
 
-Be sure to update: list.php, save.php, update.php, data.php with your Database information AND the AJAX requests in editor.html, index.html with the paths the new PHP files. I will consolidate these files and the requests to them soon.
+Be sure to update: list.php, save.php, update.php, data.php with your Database information AND the AJAX requests in editor.html, index.html with your paths to the PHP files. I will consolidate these files and the requests to them soon.
 
 # Contact me
 
