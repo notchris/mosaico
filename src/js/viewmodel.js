@@ -142,9 +142,9 @@ function initializeEditor(content, blockDefs, thumbPathConverter, galleryUrl) {
     debug: ko.observable(false),
     contentListeners: ko.observable(0),
     
-    logoPath: 'dist/img/mosaico32.png',
+    logoPath: '',
     logoUrl: '.',
-    logoAlt: 'mosaico'
+    logoAlt: 'CSC'
   };
 
   // viewModel.content = content._instrument(ko, content, undefined, true);
@@ -439,12 +439,11 @@ function initializeEditor(content, blockDefs, thumbPathConverter, galleryUrl) {
 
   function conditional_restore(html) {
     return html.replace(/<replacedcc[^>]* condition="([^"]*)"[^>]*>([\s\S]*?)<\/replacedcc>/g, function(match, condition, body) {
-      var dd = '<!--[if '+condition.replace(/&amp;/, '&')+']>';
-      dd += body.replace(/<!-- cc:bc:([A-Za-z:]*) -->(<\/cc>)?<!-- cc:ac:\1 -->/g, '</$1>') // restore closing tags (including lost tags)
-            .replace(/><\/cc><!-- cc:sc -->/g, '/>') // restore selfclosing tags
-            .replace(/<!-- cc:bo:([A-Za-z:]*) --><cc/g, '<$1') // restore open tags
-            .replace(/^.*<!-- cc:start -->/,'') // remove content before start
-            .replace(/<!-- cc:end -->.*$/,''); // remove content after end
+      var dd = '<!--[if '+condition+']>';
+      dd += body.replace(/<!-- cc:before:([^ ]*) --><!-- cc:after:\1 -->/g, '</$1>')
+            .replace(/^.*<!-- cc:start -->/,'')
+            .replace(/<!-- cc:end -->.*$/,'')
+            .replace(/<(\/?)cc([A-Za-z]*)/g, '<$1$2');
       dd += '<![endif]-->';
       return dd;
     });
@@ -455,10 +454,6 @@ function initializeEditor(content, blockDefs, thumbPathConverter, galleryUrl) {
     $('body').append('<iframe id="' + id + '" data-bind="bindIframe: $data"></iframe>');
     var frameEl = global.document.getElementById(id);
     ko.applyBindings(viewModel, frameEl);
-
-    ko.cleanNode(frameEl);
-    if (viewModel.inline) viewModel.inline(frameEl.contentWindow.document);
-
     // Obsolete method didn't work on IE11 when using "HTML5 doctype":
     // var docType = new XMLSerializer().serializeToString(global.document.doctype);
     var node = frameEl.contentWindow.document.doctype;
@@ -467,6 +462,7 @@ function initializeEditor(content, blockDefs, thumbPathConverter, galleryUrl) {
       (!node.publicId && node.systemId ? ' SYSTEM' : '') +
       (node.systemId ? ' "' + node.systemId + '"' : '') + '>';
     var content = docType + "\n" + frameEl.contentWindow.document.documentElement.outerHTML;
+    ko.cleanNode(frameEl);
     ko.removeNode(frameEl);
 
     content = content.replace(/<script ([^>]* )?type="text\/html"[^>]*>[\s\S]*?<\/script>/gm, '');
